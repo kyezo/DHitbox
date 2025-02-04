@@ -30,7 +30,7 @@ button.Draggable = true
 local function updateProperties(character)
     local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
     if enabled then
-        humanoidRootPart.Size = Vector3.new(10, 10, 10)
+        humanoidRootPart.Size = Vector3.new(6, 6, 6)
         humanoidRootPart.Transparency = 0.9
         humanoidRootPart.BrickColor = BrickColor.New("Medium blue")
         humanoidRootPart.CanCollide = false
