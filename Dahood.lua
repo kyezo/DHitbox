@@ -400,8 +400,11 @@ UIAspectRatioConstraint_4.AspectRatio = 1.550
 -- Gui to Lua
 -- Version: 3.2
 
+-- Instances (unchanged, same as provided in the original script)
 
-local function OTBTFZ_fake_script()
+-- Scripts:
+
+local function OTBTFZ_fake_script() -- Hitbox.LocalScript 
 	local script = Instance.new('LocalScript', Hitbox)
 
 	local Players = game:GetService("Players")
@@ -427,6 +430,7 @@ local function OTBTFZ_fake_script()
 	local enabled = false
 	local appliedMultipliers = {}
 	
+	-- Make the Background draggable
 	shadow.Draggable = true
 	shadow.Active = true
 	shadow.Selectable = true
@@ -439,6 +443,7 @@ local function OTBTFZ_fake_script()
 		infoFrame.Visible = not infoFrame.Visible
 	end)
 	
+	-- Function to find a player by username or display name
 	local function findPlayerByName(partialName)
 		for _, player in pairs(Players:GetPlayers()) do
 			if string.find(string.lower(player.Name), string.lower(partialName), 1, true) or 
@@ -449,6 +454,7 @@ local function OTBTFZ_fake_script()
 		return nil
 	end
 	
+	-- Function to update hitbox properties (modified for Head)
 	local function updateProperties(character, multiplier)
 		local head = character:FindFirstChild("Head")
 		if head then
@@ -465,12 +471,14 @@ local function OTBTFZ_fake_script()
 		end
 	end
 	
+	-- Apply button function
 	applyButton.MouseButton1Click:Connect(function()
 		local targetName = usernameBox.Text
 		local multiplier = tonumber(multiplierBox.Text)
 	
 		if targetName ~= "" and multiplier and multiplier > 0 then
 			if targetName == "all" then
+				-- Apply to all players except self
 				for _, player in pairs(Players:GetPlayers()) do
 					if player ~= me and player.Character then
 						appliedMultipliers[player.Name] = multiplier
@@ -487,6 +495,7 @@ local function OTBTFZ_fake_script()
 		end
 	end)
 	
+	-- Reset button function (updated for Head)
 	resetButton.MouseButton1Click:Connect(function()
 		for _, player in pairs(Players:GetPlayers()) do
 			if player.Character then
@@ -501,11 +510,13 @@ local function OTBTFZ_fake_script()
 		end
 	end)
 	
+	-- Toggle button function
 	local function toggleState()
 		enabled = not enabled
 		toggleButton.Text = enabled and "Enabled(T)" or "Disabled(T)"
 		toggleButton.BackgroundColor3 = enabled and Color3.fromRGB(85, 150, 85) or Color3.fromRGB(200, 85, 85)
 	
+		-- Update all applied players
 		for playerName, multiplier in pairs(appliedMultipliers) do
 			local player = Players:FindFirstChild(playerName)
 			if player and player.Character then
@@ -516,12 +527,14 @@ local function OTBTFZ_fake_script()
 	
 	toggleButton.MouseButton1Click:Connect(toggleState)
 	
+	-- Keyboard shortcut for toggle (T key)
 	UserInputService.InputBegan:Connect(function(input, gameProcessed)
 		if not gameProcessed and input.KeyCode == Enum.KeyCode.T then
 			toggleState()
 		end
 	end)
 	
+	-- Update players when they spawn
 	Players.PlayerAdded:Connect(function(player)
 		player.CharacterAdded:Connect(function(character)
 			local multiplier = appliedMultipliers[player.Name]
@@ -531,6 +544,7 @@ local function OTBTFZ_fake_script()
 		end)
 	end)
 	
+	-- Initialize existing players
 	for _, player in pairs(Players:GetPlayers()) do
 		player.CharacterAdded:Connect(function(character)
 			local multiplier = appliedMultipliers[player.Name]
