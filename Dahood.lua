@@ -58,7 +58,7 @@ Hitbox.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 Shadow.Name = "Shadow"
 Shadow.Parent = Hitbox
 Shadow.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-Shadow.BackgroundTransparency = 0.700
+Shadow.BackgroundTransparency = 0.500
 Shadow.BorderColor3 = Color3.fromRGB(0, 0, 0)
 Shadow.BorderSizePixel = 0
 Shadow.Position = UDim2.new(0.823696673, 0, 0.35725677, 0)
@@ -73,7 +73,7 @@ UIAspectRatioConstraint.Parent = Shadow
 Background.Name = "Background"
 Background.Parent = Shadow
 Background.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-Background.BackgroundTransparency = 0.300
+Background.BackgroundTransparency = 0.250
 Background.BorderColor3 = Color3.fromRGB(0, 0, 0)
 Background.BorderSizePixel = 0
 Background.Position = UDim2.new(-0.00146880571, 0, -0.000140652177, 0)
@@ -101,6 +101,7 @@ ToggleButton.TextColor3 = Color3.fromRGB(0, 0, 0)
 ToggleButton.TextScaled = true
 ToggleButton.TextSize = 14.000
 ToggleButton.TextWrapped = true
+ToggleButton.Font = Enum.Font.Jura
 
 UICorner_3.Parent = ToggleButton
 
@@ -124,6 +125,7 @@ MenuName.TextColor3 = Color3.fromRGB(255, 255, 255)
 MenuName.TextScaled = true
 MenuName.TextSize = 14.000
 MenuName.TextWrapped = true
+MenuName.Font = Enum.Font.Jura
 
 UIPadding_2.Parent = MenuName
 UIPadding_2.PaddingBottom = UDim.new(0.0500000007, 0)
@@ -170,6 +172,7 @@ ApplyButton.TextColor3 = Color3.fromRGB(0, 0, 0)
 ApplyButton.TextScaled = true
 ApplyButton.TextSize = 14.000
 ApplyButton.TextWrapped = true
+ApplyButton.Font = Enum.Font.Jura
 
 UICorner_5.Parent = ApplyButton
 
@@ -218,6 +221,7 @@ ResetButton.TextColor3 = Color3.fromRGB(0, 0, 0)
 ResetButton.TextScaled = true
 ResetButton.TextSize = 14.000
 ResetButton.TextWrapped = true
+ResetButton.Font = Enum.Font.Jura
 
 UICorner_7.Parent = ResetButton
 
@@ -290,6 +294,7 @@ Info.TextColor3 = Color3.fromRGB(255, 255, 255)
 Info.TextScaled = true
 Info.TextSize = 14.000
 Info.TextWrapped = true
+Info.Font = Enum.Font.Jura
 
 UIPadding_7.Parent = Info
 UIPadding_7.PaddingBottom = UDim.new(0.0500000007, 0)
@@ -328,7 +333,7 @@ All.BorderSizePixel = 0
 All.Position = UDim2.new(0.0199999902, 0, 0.496208698, 0)
 All.Size = UDim2.new(0.956969738, 0, 0.16014196, 0)
 All.Font = Enum.Font.Unknown
-All.Text = "Type "all" to apply to every player in the server (Not urself)."
+All.Text = "Type \"all\" to apply to every player in the server (Not urself)."
 All.TextColor3 = Color3.fromRGB(255, 255, 255)
 All.TextScaled = true
 All.TextSize = 14.000
@@ -397,11 +402,6 @@ UIPadding_11.PaddingTop = UDim.new(0.0500000007, 0)
 UIAspectRatioConstraint_4.Parent = Shadow2
 UIAspectRatioConstraint_4.AspectRatio = 1.550
 
--- Gui to Lua
--- Version: 3.2
-
--- Instances (unchanged, same as provided in the original script)
-
 -- Scripts:
 
 local function OTBTFZ_fake_script() -- Hitbox.LocalScript 
@@ -409,40 +409,44 @@ local function OTBTFZ_fake_script() -- Hitbox.LocalScript
 
 	local Players = game:GetService("Players")
 	local UserInputService = game:GetService("UserInputService")
-	
+
 	local me = Players.LocalPlayer
 	local playerGui = me:WaitForChild("PlayerGui")
-	local screenGui = playerGui:WaitForChild("Hitbox")
+	local screenGui = playerGui:WaitForChild("Hitbox") -- The existing UI in StarterGui
 	local shadow = screenGui:WaitForChild("Shadow")
 	local background = shadow.Background
-	
+
 	local usernameBox = background:WaitForChild("Username")
 	local multiplierBox = background:WaitForChild("Multiplier")
 	local applyButton = background:WaitForChild("ApplyButton")
 	local resetButton = background:WaitForChild("ResetButton")
 	local toggleButton = background:WaitForChild("ToggleButton")
-	
+
 	local infoFrame = screenGui:WaitForChild("Shadow2")
 	infoFrame.Visible = false
-	
+
 	local infoButton = background:WaitForChild("InfoButton")
-	
+
 	local enabled = false
 	local appliedMultipliers = {}
-	
+
 	-- Make the Background draggable
 	shadow.Draggable = true
 	shadow.Active = true
 	shadow.Selectable = true
-	
+
 	infoFrame.Draggable = true
 	infoFrame.Active = true
 	infoFrame.Selectable = true
-	
+
 	infoButton.MouseButton1Click:Connect(function()
-		infoFrame.Visible = not infoFrame.Visible
+		if infoFrame.Visible then
+			infoFrame.Visible = false
+		else
+			infoFrame.Visible = true
+		end
 	end)
-	
+
 	-- Function to find a player by username or display name
 	local function findPlayerByName(partialName)
 		for _, player in pairs(Players:GetPlayers()) do
@@ -453,32 +457,33 @@ local function OTBTFZ_fake_script() -- Hitbox.LocalScript
 		end
 		return nil
 	end
-	
-	-- Function to update hitbox properties (modified for Head)
+
+	-- Function to update hitbox properties
 	local function updateProperties(character, multiplier)
-		local head = character:FindFirstChild("Head")
-		if head then
+		local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+		if humanoidRootPart then
 			if enabled then
-				head.Size = Vector3.new(1 * multiplier, 1 * multiplier, 1 * multiplier)
-				head.BrickColor = BrickColor.new("Bright blue")
-				head.Transparency = 0.8
-				head.CanCollide = false
+				humanoidRootPart.Size = Vector3.new(2 * multiplier, 2 * multiplier, 1 * multiplier)
+				humanoidRootPart.BrickColor = BrickColor.new("Bright blue") -- Set hitbox to blue
+				humanoidRootPart.Transparency = 0.8 -- Set transparency to 0.8 when enabled
+				humanoidRootPart.CanCollide = false
 			else
-				head.Size = Vector3.new(1, 1, 1)
-				head.Transparency = 1
-				head.CanCollide = true
+				humanoidRootPart.Size = Vector3.new(2, 2, 1)
+				humanoidRootPart.Transparency = 1 -- Default transparency
+				humanoidRootPart.CanCollide = true
 			end
 		end
 	end
-	
+
+
 	-- Apply button function
 	applyButton.MouseButton1Click:Connect(function()
 		local targetName = usernameBox.Text
 		local multiplier = tonumber(multiplierBox.Text)
-	
+
 		if targetName ~= "" and multiplier and multiplier > 0 then
 			if targetName == "all" then
-				-- Apply to all players except self
+				-- Apply multiplier to all players except yourself
 				for _, player in pairs(Players:GetPlayers()) do
 					if player ~= me and player.Character then
 						appliedMultipliers[player.Name] = multiplier
@@ -494,29 +499,29 @@ local function OTBTFZ_fake_script() -- Hitbox.LocalScript
 			end
 		end
 	end)
-	
-	-- Reset button function (updated for Head)
+
+
+	-- Reset button function (now also sets transparency to 1)
 	resetButton.MouseButton1Click:Connect(function()
 		for _, player in pairs(Players:GetPlayers()) do
 			if player.Character then
 				appliedMultipliers[player.Name] = nil
-				local head = player.Character:FindFirstChild("Head")
-				if head then
-					head.Size = Vector3.new(1, 1, 1)
-					head.Transparency = 1
-					head.CanCollide = true
+				local humanoidRootPart = player.Character:FindFirstChild("HumanoidRootPart")
+				if humanoidRootPart then
+					humanoidRootPart.Size = Vector3.new(2, 2, 1)
+					humanoidRootPart.Transparency = 1 -- Make it fully invisible
+					humanoidRootPart.CanCollide = true
 				end
 			end
 		end
 	end)
-	
+
 	-- Toggle button function
 	local function toggleState()
 		enabled = not enabled
 		toggleButton.Text = enabled and "Enabled(T)" or "Disabled(T)"
-		toggleButton.BackgroundColor3 = enabled and Color3.fromRGB(85, 150, 85) or Color3.fromRGB(200, 85, 85)
-	
-		-- Update all applied players
+		toggleButton.BackgroundColor3 = enabled and Color3.fromRGB(85, 150, 85) or Color3.fromRGB(200, 85, 85) -- Green when enabled, Red when disabled
+
 		for playerName, multiplier in pairs(appliedMultipliers) do
 			local player = Players:FindFirstChild(playerName)
 			if player and player.Character then
@@ -524,34 +529,38 @@ local function OTBTFZ_fake_script() -- Hitbox.LocalScript
 			end
 		end
 	end
-	
+
 	toggleButton.MouseButton1Click:Connect(toggleState)
-	
-	-- Keyboard shortcut for toggle (T key)
+
+	-- Keep Reset button yellow at all times
+	resetButton.BackgroundColor3 = Color3.fromRGB(255, 221, 51) -- Yellow
+
+	-- Enable toggle via keyboard (T key)
 	UserInputService.InputBegan:Connect(function(input, gameProcessed)
-		if not gameProcessed and input.KeyCode == Enum.KeyCode.T then
+		if gameProcessed then return end
+		if input.UserInputType == Enum.UserInputType.Keyboard and input.KeyCode == Enum.KeyCode.T then
 			toggleState()
 		end
 	end)
 	
-	-- Update players when they spawn
+	UserInputService.InputBegan:Connect(function(input, gameProcessed)
+	if gameProcessed then return end
+	if input.UserInputType == Enum.UserInputType.Keyboard and input.KeyCode == Enum.KeyCode.Y then
+		if Hitbox.Enabled == true then
+			Hitbox.Enabled = false
+		else
+			Hitbox.Enabled = true
+		end
+	end
+end)
+
+	-- Update players on spawn
 	Players.PlayerAdded:Connect(function(player)
 		player.CharacterAdded:Connect(function(character)
-			local multiplier = appliedMultipliers[player.Name]
-			if multiplier then
-				updateProperties(character, multiplier)
-			end
+			local multiplier = appliedMultipliers[player.Name] or 1
+			updateProperties(character, multiplier)
 		end)
 	end)
-	
-	-- Initialize existing players
-	for _, player in pairs(Players:GetPlayers()) do
-		player.CharacterAdded:Connect(function(character)
-			local multiplier = appliedMultipliers[player.Name]
-			if multiplier then
-				updateProperties(character, multiplier)
-			end
-		end)
-	end
+
 end
 coroutine.wrap(OTBTFZ_fake_script)()
