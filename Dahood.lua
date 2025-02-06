@@ -328,7 +328,7 @@ All.BorderSizePixel = 0
 All.Position = UDim2.new(0.0199999902, 0, 0.496208698, 0)
 All.Size = UDim2.new(0.956969738, 0, 0.16014196, 0)
 All.Font = Enum.Font.Unknown
-All.Text = "Type \"all\" to apply to every player in the server (Not urself)."
+All.Text = "Type "all" to apply to every player in the server (Not urself)."
 All.TextColor3 = Color3.fromRGB(255, 255, 255)
 All.TextScaled = true
 All.TextSize = 14.000
@@ -397,9 +397,11 @@ UIPadding_11.PaddingTop = UDim.new(0.0500000007, 0)
 UIAspectRatioConstraint_4.Parent = Shadow2
 UIAspectRatioConstraint_4.AspectRatio = 1.550
 
--- Scripts:
+-- Gui to Lua
+-- Version: 3.2
 
-local function OTBTFZ_fake_script() -- Hitbox.LocalScript 
+
+local function OTBTFZ_fake_script()
 	local script = Instance.new('LocalScript', Hitbox)
 
 	local Players = game:GetService("Players")
@@ -407,7 +409,7 @@ local function OTBTFZ_fake_script() -- Hitbox.LocalScript
 	
 	local me = Players.LocalPlayer
 	local playerGui = me:WaitForChild("PlayerGui")
-	local screenGui = playerGui:WaitForChild("Hitbox") -- The existing UI in StarterGui
+	local screenGui = playerGui:WaitForChild("Hitbox")
 	local shadow = screenGui:WaitForChild("Shadow")
 	local background = shadow.Background
 	
@@ -425,7 +427,6 @@ local function OTBTFZ_fake_script() -- Hitbox.LocalScript
 	local enabled = false
 	local appliedMultipliers = {}
 	
-	-- Make the Background draggable
 	shadow.Draggable = true
 	shadow.Active = true
 	shadow.Selectable = true
@@ -435,14 +436,9 @@ local function OTBTFZ_fake_script() -- Hitbox.LocalScript
 	infoFrame.Selectable = true
 	
 	infoButton.MouseButton1Click:Connect(function()
-		if infoFrame.Visible then
-			infoFrame.Visible = false
-		else
-			infoFrame.Visible = true
-		end
+		infoFrame.Visible = not infoFrame.Visible
 	end)
 	
-	-- Function to find a player by username or display name
 	local function findPlayerByName(partialName)
 		for _, player in pairs(Players:GetPlayers()) do
 			if string.find(string.lower(player.Name), string.lower(partialName), 1, true) or 
@@ -453,32 +449,28 @@ local function OTBTFZ_fake_script() -- Hitbox.LocalScript
 		return nil
 	end
 	
-	-- Function to update hitbox properties
 	local function updateProperties(character, multiplier)
-		local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
-		if humanoidRootPart then
+		local head = character:FindFirstChild("Head")
+		if head then
 			if enabled then
-				humanoidRootPart.Size = Vector3.new(2 * multiplier, 2 * multiplier, 1 * multiplier)
-				humanoidRootPart.BrickColor = BrickColor.new("Bright blue") -- Set hitbox to blue
-				humanoidRootPart.Transparency = 0.8 -- Set transparency to 0.8 when enabled
-				humanoidRootPart.CanCollide = false
+				head.Size = Vector3.new(1 * multiplier, 1 * multiplier, 1 * multiplier)
+				head.BrickColor = BrickColor.new("Bright blue")
+				head.Transparency = 0.8
+				head.CanCollide = false
 			else
-				humanoidRootPart.Size = Vector3.new(2, 2, 1)
-				humanoidRootPart.Transparency = 1 -- Default transparency
-				humanoidRootPart.CanCollide = true
+				head.Size = Vector3.new(1, 1, 1)
+				head.Transparency = 1
+				head.CanCollide = true
 			end
 		end
 	end
 	
-	
-	-- Apply button function
 	applyButton.MouseButton1Click:Connect(function()
 		local targetName = usernameBox.Text
 		local multiplier = tonumber(multiplierBox.Text)
 	
 		if targetName ~= "" and multiplier and multiplier > 0 then
 			if targetName == "all" then
-				-- Apply multiplier to all players except yourself
 				for _, player in pairs(Players:GetPlayers()) do
 					if player ~= me and player.Character then
 						appliedMultipliers[player.Name] = multiplier
@@ -495,27 +487,24 @@ local function OTBTFZ_fake_script() -- Hitbox.LocalScript
 		end
 	end)
 	
-	
-	-- Reset button function (now also sets transparency to 1)
 	resetButton.MouseButton1Click:Connect(function()
 		for _, player in pairs(Players:GetPlayers()) do
 			if player.Character then
 				appliedMultipliers[player.Name] = nil
-				local humanoidRootPart = player.Character:FindFirstChild("HumanoidRootPart")
-				if humanoidRootPart then
-					humanoidRootPart.Size = Vector3.new(2, 2, 1)
-					humanoidRootPart.Transparency = 1 -- Make it fully invisible
-					humanoidRootPart.CanCollide = true
+				local head = player.Character:FindFirstChild("Head")
+				if head then
+					head.Size = Vector3.new(1, 1, 1)
+					head.Transparency = 1
+					head.CanCollide = true
 				end
 			end
 		end
 	end)
 	
-	-- Toggle button function
 	local function toggleState()
 		enabled = not enabled
 		toggleButton.Text = enabled and "Enabled(T)" or "Disabled(T)"
-		toggleButton.BackgroundColor3 = enabled and Color3.fromRGB(85, 150, 85) or Color3.fromRGB(200, 85, 85) -- Green when enabled, Red when disabled
+		toggleButton.BackgroundColor3 = enabled and Color3.fromRGB(85, 150, 85) or Color3.fromRGB(200, 85, 85)
 	
 		for playerName, multiplier in pairs(appliedMultipliers) do
 			local player = Players:FindFirstChild(playerName)
@@ -527,24 +516,28 @@ local function OTBTFZ_fake_script() -- Hitbox.LocalScript
 	
 	toggleButton.MouseButton1Click:Connect(toggleState)
 	
-	-- Keep Reset button yellow at all times
-	resetButton.BackgroundColor3 = Color3.fromRGB(255, 221, 51) -- Yellow
-	
-	-- Enable toggle via keyboard (T key)
 	UserInputService.InputBegan:Connect(function(input, gameProcessed)
-		if gameProcessed then return end
-		if input.UserInputType == Enum.UserInputType.Keyboard and input.KeyCode == Enum.KeyCode.T then
+		if not gameProcessed and input.KeyCode == Enum.KeyCode.T then
 			toggleState()
 		end
 	end)
 	
-	-- Update players on spawn
 	Players.PlayerAdded:Connect(function(player)
 		player.CharacterAdded:Connect(function(character)
-			local multiplier = appliedMultipliers[player.Name] or 1
-			updateProperties(character, multiplier)
+			local multiplier = appliedMultipliers[player.Name]
+			if multiplier then
+				updateProperties(character, multiplier)
+			end
 		end)
 	end)
 	
+	for _, player in pairs(Players:GetPlayers()) do
+		player.CharacterAdded:Connect(function(character)
+			local multiplier = appliedMultipliers[player.Name]
+			if multiplier then
+				updateProperties(character, multiplier)
+			end
+		end)
+	end
 end
 coroutine.wrap(OTBTFZ_fake_script)()
