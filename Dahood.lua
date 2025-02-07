@@ -333,7 +333,7 @@ All.BorderSizePixel = 0
 All.Position = UDim2.new(0.0199999902, 0, 0.496208698, 0)
 All.Size = UDim2.new(0.956969738, 0, 0.16014196, 0)
 All.Font = Enum.Font.Unknown
-All.Text = "Type \"all\" to apply to every player in the server (Not urself)."
+All.Text = "Type "all" to apply to every player in the server (Not urself)."
 All.TextColor3 = Color3.fromRGB(255, 255, 255)
 All.TextScaled = true
 All.TextSize = 14.000
@@ -440,11 +440,7 @@ local function OTBTFZ_fake_script() -- Hitbox.LocalScript
 	infoFrame.Selectable = true
 
 	infoButton.MouseButton1Click:Connect(function()
-		if infoFrame.Visible then
-			infoFrame.Visible = false
-		else
-			infoFrame.Visible = true
-		end
+		infoFrame.Visible = not infoFrame.Visible
 	end)
 
 	-- Function to find a player by username or display name
@@ -475,7 +471,6 @@ local function OTBTFZ_fake_script() -- Hitbox.LocalScript
 		end
 	end
 
-
 	-- Apply button function
 	applyButton.MouseButton1Click:Connect(function()
 		local targetName = usernameBox.Text
@@ -499,7 +494,6 @@ local function OTBTFZ_fake_script() -- Hitbox.LocalScript
 			end
 		end
 	end)
-
 
 	-- Reset button function (now also sets transparency to 1)
 	resetButton.MouseButton1Click:Connect(function()
@@ -544,15 +538,11 @@ local function OTBTFZ_fake_script() -- Hitbox.LocalScript
 	end)
 	
 	UserInputService.InputBegan:Connect(function(input, gameProcessed)
-	if gameProcessed then return end
-	if input.UserInputType == Enum.UserInputType.Keyboard and input.KeyCode == Enum.KeyCode.Y then
-		if Hitbox.Enabled == true then
-			Hitbox.Enabled = false
-		else
-			Hitbox.Enabled = true
+		if gameProcessed then return end
+		if input.UserInputType == Enum.UserInputType.Keyboard and input.KeyCode == Enum.KeyCode.Y then
+			Hitbox.Enabled = not Hitbox.Enabled
 		end
-	end
-end)
+	end)
 
 	-- Update players on spawn
 	Players.PlayerAdded:Connect(function(player)
@@ -561,6 +551,5 @@ end)
 			updateProperties(character, multiplier)
 		end)
 	end)
-
 end
 coroutine.wrap(OTBTFZ_fake_script)()
